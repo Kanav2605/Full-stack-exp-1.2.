@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment: Dynamic Product Filter</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <style>
+        /* 1. GLOBAL STYLES */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb; /* Very light grey */
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+            margin: 0;
+            color: #111827;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+        }
+
+        /* 2. HEADER & FILTER SECTION */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .filter-label {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        select {
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        /* 3. PRODUCT GRID LAYOUT */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Responsive columns */
+            gap: 20px;
+        }
+
+        /* 4. PRODUCT CARD DESIGN */
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px; /* Fixed height for uniformity */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        /* 5. CATEGORY BADGES */
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px; /* Pill shape */
+            font-size: 0.875rem;
+            font-weight: 500;
+            width: fit-content;
+        }
+
+        /* Dynamic styles based on category */
+        .badge.electronics {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+        }
+
+        .badge.clothing {
+            background-color: #bfdbfe; /* Light Blue */
+            color: #1e40af; /* Dark Blue Text */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        // 1. DATA: The list of products shown in your image
+        const productsData = [
+            { id: 1, name: "Wireless Headphones", price: 129.99, category: "electronics" },
+            { id: 2, name: "Cotton T-Shirt",      price: 24.99,  category: "clothing" },
+            { id: 3, name: "Bluetooth Speaker",   price: 89.99,  category: "electronics" },
+            { id: 4, name: "Denim Jeans",         price: 59.99,  category: "clothing" }
+        ];
+
+        // 2. COMPONENT: The Main App
+        function ProductFilterApp() {
+            // State to hold the current filter selection
+            const [selectedCategory, setSelectedCategory] = React.useState("all");
+
+            // Function to handle dropdown changes
+            const handleFilterChange = (event) => {
+                setSelectedCategory(event.target.value);
+            };
+
+            // Logic to filter the array based on state
+            const filteredProducts = productsData.filter(product => {
+                if (selectedCategory === "all") return true; // Show everything
+                return product.category === selectedCategory;
+            });
+
+            return (
+                <div className="container">
+                    <h1>Product Filter</h1>
+
+                    {/* Filter Section */}
+                    <div className="filter-bar">
+                        <label className="filter-label">Filter by:</label>
+                        <select value={selectedCategory} onChange={handleFilterChange}>
+                            <option value="all">All Products</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing</option>
+                        </select>
+                    </div>
+
+                    {/* Product Grid */}
+                    <div className="product-grid">
+                        {filteredProducts.map(product => (
+                            <div key={product.id} className="card">
+                                <div>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-price">${product.price}</div>
+                                </div>
+                                <span className={`badge ${product.category}`}>
+                                    {product.category}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // 3. RENDER: Mount the app to the page
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ProductFilterApp />);
+
+    </script>
+</body>
+</html>
